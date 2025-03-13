@@ -17,6 +17,7 @@ public class FinalStroke : Stroke
     private Graph _graph;
 
     public Vector3[] inputSamples { get; private set; } = null;
+    public List<Sample> inputsampleSamples { get; private set; } = null;
 
     
 
@@ -47,7 +48,7 @@ public class FinalStroke : Stroke
         int idx = 0;
         foreach (var p in pts)
         {
-            Gizmos.color = idx % 3 == 0 ? Color.blue: Color.yellow;
+            Gizmos.color = Color.yellow;
             Gizmos.DrawSphere(transform.TransformPoint(p), 0.002f);
             idx++;
         }
@@ -58,6 +59,7 @@ public class FinalStroke : Stroke
             Vector3 midpoint = this.transform.TransformPoint(s.GetPointAt(0.5f));
             Handles.Label(midpoint, s.ID.ToString());
         }
+         Debug.Log("OnDrawGizmos final called");
 
 
     }
@@ -115,9 +117,10 @@ public class FinalStroke : Stroke
 
     }
 
-    public void SaveInputSamples(Vector3[] samples)
+    public void SaveInputSamples(Vector3[] samples, List<Sample> inputsample)
     {
         inputSamples = samples;
+        inputsampleSamples=inputsample;
     }
 
     public override void Destroy()

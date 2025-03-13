@@ -11,10 +11,11 @@ public class Sample
     public Vector3 velocity;
     public float CreationTime { get; }
 
-    public Sample(Vector3 position, Vector3 normal, float pressure, Vector3 velocity)
+    public Sample(Vector3 position, Vector3 normal, Vector3 tangent, float pressure, Vector3 velocity)
     {
         this.position = position;
         this.normal = normal;
+        this.tangent = tangent;
         this.pressure = pressure;
         this.velocity = velocity;
         this.CreationTime = Time.time;

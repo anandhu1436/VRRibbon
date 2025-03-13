@@ -83,12 +83,13 @@ public class DrawController : MonoBehaviour
         // Check if current selected patch is still nearby
         UpdateSelectedPatch(position);
 
-        Vector3 brushNormal = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 0, 1)); // seems fine
+        Vector3 brushNormal = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 1, 0)); // seems fine
+        Vector3 brushtangent = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 1, 0)); // seems fine
         Vector3 relativePos = canvas.transform.InverseTransformPoint(position);
 
         //Debug.DrawLine(samplePos, samplePos + brushNormal * 0.1f, Color.white, 100f);
 
-        Sample s = new Sample(relativePos, brushNormal, pressure, velocity);
+        Sample s = new Sample(relativePos, brushNormal, brushtangent, pressure, velocity);
 
         currentStroke.AddSample(s);
 
@@ -123,7 +124,14 @@ public class DrawController : MonoBehaviour
         finalStroke.SetID(finalStrokeID);
         finalStrokeID++;
         finalStroke.SetCurve(snappedCurve, closedLoop: closedLoop);
-        finalStroke.SaveInputSamples(currentStroke.GetPoints().ToArray());
+        finalStroke.SaveInputSamples(currentStroke.GetPoints().ToArray(),currentStroke.Samples);
+
+        canvas.Add(finalStroke);
+
+        finalStroke.SetMesh(currentStroke.GetGeneratedMesh());
+        RenderStroke(finalStroke);
+
+
 
             strokeData = new SerializableStroke(
             finalStroke.ID,
@@ -136,154 +144,12 @@ public class DrawController : MonoBehaviour
             closedLoop
             );
 
-
+        currentStroke.Destroy();
         currentStroke = null;
 
         return true; // success in creating final stroke
     }
 
-    // public bool CommitStroke(Vector3 position, out SerializableStroke strokeData, bool mirror = false)
-    // {
-    //     // Guard against invalid input
-    //     if (!currentStroke.IsValid(parameters.Current.MinStrokeActionTime, parameters.Current.MinStrokeSize))
-    //     {
-    //         // Destroy input stroke
-    //         currentStroke.Destroy();
-    //         strokeData = new SerializableStroke(-1);
-    //         return false;
-    //     }
-
-    //     (Curve.Curve snappedCurve,
-    //     IntersectionConstraint[] intersections,
-    //     MirrorPlaneConstraint[] mirrorIntersections) =
-    //             beautifier.Beautify(
-    //                 currentStroke,
-    //                 Beautification,
-    //                 mirror,
-    //                 out List<SerializableConstraint> appliedConstraints,
-    //                 out List<SerializableConstraint> rejectedConstraints,
-    //                 out bool planar,
-    //                 out bool onSurface,
-    //                 out bool onMirror,
-    //                 out bool closedLoop);
-
-    //     if (!snappedCurve.IsValid(parameters.Current.MinStrokeSize))
-    //     {
-    //         // Destroy input stroke
-    //         currentStroke.Destroy();
-    //         strokeData = new SerializableStroke(-1);
-    //         return false;
-    //     }
-
-
-
-    //     // Trim dangling endpoint bits
-    //     // Consider all intersections to find the first and last one
-    //     // If these intersections are near the stroke endpoint, cut the stroke there
-    //     // And correct each on curve parameter t for other intersections 
-    //     if (intersections.Length > 0 || (mirror && mirrorIntersections.Length > 0))
-    //     {
-    //         TrimDanglingEndpoints(snappedCurve, intersections, mirrorIntersections);
-    //     }
-
-    //     // Create final stroke game object and render the stroke
-    //     GameObject strokeObject = canvas.Create(finalStrokePrefab, Primitive.Stroke);
-
-    //     FinalStroke finalStroke = strokeObject.GetComponent<FinalStroke>();
-    //     finalStroke.SetID(finalStrokeID);
-    //     finalStrokeID++;
-    //     finalStroke.SetCurve(snappedCurve, closedLoop: closedLoop);
-    //     finalStroke.SaveInputSamples(currentStroke.GetPoints().ToArray());
-
-
-    //     foreach (var intersection in intersections)
-    //     {
-    //         // OLD STROKE: Create or fetch node and create new segments if needed
-    //         //Debug.Log("intersection param = " + intersection.NewCurveData.t.ToString("F6"));
-    //         INode node = intersection.IntersectedStroke.AddIntersectionOldStroke(intersection.OldCurveData, parameters.Current.SnapToExistingNodeThreshold);
-
-    //         // NEW STROKE: Insert node and create new segments if needed
-    //         finalStroke.AddIntersectionNewStroke(node, intersection.NewCurveData, parameters.Current.MergeConstraintsThreshold);
-
-    //         Debug.Log("[GRAPH UPDATE] added node with " + node.IncidentCount + " neighbors");
-    //     }
-
-
-    //     // Mirroring
-    //     mirror=false;
-    //     if (mirror)
-    //     {
-
-    //         // Create mirrored final stroke game object
-    //         GameObject mirrorStrokeObject = canvas.Create(finalStrokePrefab, Primitive.Stroke);
-
-    //         FinalStroke mirrorFinalStroke = mirrorStrokeObject.GetComponent<FinalStroke>();
-    //         mirrorFinalStroke.SetID(finalStrokeID);
-
-    //         // Set up mirror stroke curve and intersections
-    //         bool mirrorSuccess = mirrorPlane.Mirror(
-    //             finalStroke, ref mirrorFinalStroke,
-    //             onMirror,
-    //             intersections, mirrorIntersections,
-    //             closedLoop,
-    //             parameters.Current.ProximityThreshold,
-    //             parameters.Current.SnapToExistingNodeThreshold,
-    //             parameters.Current.MergeConstraintsThreshold,
-    //             prevent_extra_mirroring: !Beautification);
-
-    //         if (mirrorSuccess)
-    //         {
-    //             canvas.Add(mirrorFinalStroke);
-
-    //             RenderStroke(mirrorFinalStroke);
-
-    //             // Generate collider mesh
-    //             SolidifyStroke(mirrorFinalStroke);
-
-    //             finalStrokeID++;
-    //         }
-    //         else
-    //         {
-    //             // Abort
-    //             mirrorFinalStroke.Destroy();
-    //         }
-    //     }
-
-    //     //finalStroke.TrimDanglingSegments();
-
-    //     canvas.Add(finalStroke);
-
-    //     // Generate collider mesh
-    //     SolidifyStroke(finalStroke);
-
-    //     RenderStroke(finalStroke);
-
-
-
-    //     // Record stroke data
-
-    //     strokeData = new SerializableStroke(
-    //         finalStroke.ID,
-    //         finalStroke.GetControlPoints(),
-    //         currentStroke.GetPoints(parameters.Current.ExportRDPError),
-    //         appliedConstraints,
-    //         rejectedConstraints,
-    //         onSurface,
-    //         planar,
-    //         closedLoop
-    //         );
-
-
-    //     // Destroy input stroke
-    //     currentStroke.Destroy();
-
-    //     currentStroke = null;
-
-    //     // Stop holding on to patch
-    //     DeselectPatch(position);
-
-    //     return true; // success in creating final stroke
-    // }
 
     private void RenderStroke(Stroke s)
     {

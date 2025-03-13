@@ -135,7 +135,7 @@ namespace Tubular {
             {
                 float u = (float)i / segments;
                 Vector3 p = curve.GetPoint(u);
-                Vector3 normal = frames[i].Normal;
+                Vector3 normal = frames[i].Tangent;
                 
                 Vector3 left = p - (normal * (width * 0.5f));
                 Vector3 right = p + (normal * (width * 0.5f));

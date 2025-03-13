@@ -86,7 +86,7 @@ public abstract class Stroke : MonoBehaviour
         meshRenderer.material = new Material(Shader.Find("Standard"));
         Debug.LogWarning("MeshRenderer had no material, assigning default material.");
     }
-    meshRenderer.material = lineRenderer.material;
+    //meshRenderer.material = lineRenderer.material;
 
     meshRenderer.enabled = true;
     Debug.Log("MeshRenderer enabled.");

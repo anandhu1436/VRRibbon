@@ -10,6 +10,7 @@ public class InputStroke : Stroke
 {
 
     public List<Sample> Samples { get; protected set; }
+    public List<Sample> normalSamples { get; protected set; }
 
     public List<Constraint> Constraints { get; protected set; } = new List<Constraint>();
     public List<SurfaceConstraint> SurfaceConstraints { get; private set; } = new List<SurfaceConstraint>();

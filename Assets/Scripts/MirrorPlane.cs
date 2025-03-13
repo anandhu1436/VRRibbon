@@ -151,7 +151,7 @@ public class MirrorPlane : MonoBehaviour
 
 
         mirroredStroke.SetCurve(mirrorCurve, closedLoop);
-        mirroredStroke.SaveInputSamples(Mirror(inputStroke.inputSamples));
+        mirroredStroke.SaveInputSamples(Mirror(inputStroke.inputSamples),inputStroke.inputsampleSamples);
 
         // Pair both strokes
         MirroredStrokes.Add(inputStroke.ID, mirroredStroke);

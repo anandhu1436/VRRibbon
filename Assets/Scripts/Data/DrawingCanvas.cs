@@ -47,6 +47,13 @@ public class DrawingCanvas : MonoBehaviour
     private int _OpacityIdx;
     private float pointRadius;
 
+    private List<Vector3> sphereCenters = new List<Vector3>();
+    private List<float> sphereRadii = new List<float>();
+
+    private List<GameObject> sphereObjects = new List<GameObject>(); // Store sphere objects
+    public GameObject spherePrefab; // Assign a sphere prefab in Unity Inspector
+
+
     public Vector3[] OrthoDirections { get; private set; }
 
     private void Start()
@@ -132,7 +139,7 @@ public class DrawingCanvas : MonoBehaviour
         // Draw all nodes and associated normals and tangents
         foreach (int id in nodeIDs)
         {
-            Gizmos.color = Graph.IsSharp(id) ? Color.yellow : Color.gray;
+            Gizmos.color = Color.yellow;
 
             Vector3 nodePos = this.transform.TransformPoint(Graph.Get(id));
             Vector3[] segments = Graph.GetNeighbors(id);
@@ -237,6 +244,60 @@ public class DrawingCanvas : MonoBehaviour
         // Get graph update
         GraphUpdate();
     }
+
+    
+
+    private void ComputeAndStoreCircumspheres()
+    {
+        // Clear previous spheres
+        foreach (var sphere in sphereObjects)
+            Destroy(sphere);
+        sphereObjects.Clear();
+
+        sphereCenters.Clear();
+        sphereRadii.Clear();
+
+        List<CircumSphereTest.Point3D> pointsList = new List<CircumSphereTest.Point3D>();
+        List<CircumSphereTest.Point3D> normalsList = new List<CircumSphereTest.Point3D>();
+
+        foreach (var stroke in Strokes)
+        {
+            List<Sample> Samples = stroke.inputsampleSamples;
+            for (int i = 0; i < Samples.Count; i++)
+            {
+                Sample s = Samples[i];
+
+                pointsList.Add(new CircumSphereTest.Point3D { x = s.position.x, y = s.position.y, z = s.position.z });
+                normalsList.Add(new CircumSphereTest.Point3D { x = s.normal.x, y = s.normal.y, z = s.normal.z });
+            }
+        }
+
+        int numPoints = pointsList.Count;
+        if (numPoints == 0) return;
+
+        CircumSphereTest.Point3D[] outCenters = new CircumSphereTest.Point3D[10];
+        double[] outRadii = new double[10];
+
+        int count = CircumSphereTest.computeCircumspheres(pointsList.ToArray(), normalsList.ToArray(), numPoints, outCenters, outRadii, 10);
+
+        Debug.Log($"Computed {count} Circumspheres");
+
+        for (int i = 0; i < count; i++)
+        {
+            Vector3 center = new Vector3((float)outCenters[i].x, (float)outCenters[i].y, (float)outCenters[i].z);
+            float radius = (float)outRadii[i];
+
+            sphereCenters.Add(center);
+            sphereRadii.Add(radius);
+
+            // Create a sphere GameObject
+            GameObject sphere = Instantiate(spherePrefab, center, Quaternion.identity, transform);
+            sphere.transform.localScale = Vector3.one * radius * 2; // Diameter = 2 * radius
+            sphereObjects.Add(sphere);
+        }
+    }
+
+
 
     public bool TryAddPatchAt(Vector3 worldPos, bool mirroring)
     {
@@ -392,6 +453,7 @@ public class DrawingCanvas : MonoBehaviour
 
     private void GraphUpdate()
     {
+        //ComputeAndStoreCircumspheres();
         // Update cycles
         Graph.TryFindAllCycles();
 
