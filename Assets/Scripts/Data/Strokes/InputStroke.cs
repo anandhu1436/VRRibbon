@@ -43,6 +43,7 @@ public class InputStroke : Stroke
             return null;
         }
 
+
         var vertices = new List<Vector3>();
         var normals = new List<Vector3>();
         var indices = new List<int>();
@@ -52,8 +53,8 @@ public class InputStroke : Stroke
         {
             Sample s = Samples[i];
 
-            Vector3 left = s.position - (s.normal * (width * 0.5f));
-            Vector3 right = s.position + (s.normal * (width * 0.5f));
+            Vector3 left = s.position - (s.tangent * (width));
+            Vector3 right = s.position + (s.tangent * (width ));
 
             vertices.Add(left);
             vertices.Add(right);

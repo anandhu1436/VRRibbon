@@ -83,7 +83,7 @@ public class DrawController : MonoBehaviour
         // Check if current selected patch is still nearby
         UpdateSelectedPatch(position);
 
-        Vector3 brushNormal = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 1, 0)); // seems fine
+        Vector3 brushNormal = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 0, -1)); // seems fine
         Vector3 brushtangent = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 1, 0)); // seems fine
         Vector3 relativePos = canvas.transform.InverseTransformPoint(position);
 
@@ -100,10 +100,12 @@ public class DrawController : MonoBehaviour
             RenderStroke(currentStroke); // Draw current stroke
     }
 
+
     
     public bool CommitStroke(Vector3 position, out SerializableStroke strokeData, bool mirror = false)
     {
         // Create final stroke game object and render the stroke
+        /*
         GameObject strokeObject = canvas.Create(finalStrokePrefab, Primitive.Stroke);
         (Curve.Curve snappedCurve,
         IntersectionConstraint[] intersections,
@@ -118,12 +120,14 @@ public class DrawController : MonoBehaviour
                     out bool onSurface,
                     out bool onMirror,
                     out bool closedLoop);
+        */
 
+        GameObject strokeObject = canvas.Create(finalStrokePrefab, Primitive.Stroke);
 
         FinalStroke finalStroke = strokeObject.GetComponent<FinalStroke>();
         finalStroke.SetID(finalStrokeID);
         finalStrokeID++;
-        finalStroke.SetCurve(snappedCurve, closedLoop: closedLoop);
+        //finalStroke.SetCurve(snappedCurve, closedLoop: closedLoop);
         finalStroke.SaveInputSamples(currentStroke.GetPoints().ToArray(),currentStroke.Samples);
 
         canvas.Add(finalStroke);
@@ -134,14 +138,7 @@ public class DrawController : MonoBehaviour
 
 
             strokeData = new SerializableStroke(
-            finalStroke.ID,
-            finalStroke.GetControlPoints(),
-            currentStroke.GetPoints(parameters.Current.ExportRDPError),
-            appliedConstraints,
-            rejectedConstraints,
-            onSurface,
-            planar,
-            closedLoop
+            finalStroke.ID
             );
 
         currentStroke.Destroy();
@@ -165,12 +162,12 @@ public class DrawController : MonoBehaviour
         //Mesh strokeMesh = brush.Solidify(s.Curve, true);
         int tubularSegments = Mathf.CeilToInt(s.Curve.GetLength() * subdivisionsPerUnit);
 
-        Mesh strokeMesh = Tubular.Ribbon.Build(s.Curve, tubularSegments, 5*colliderRadius);
+        //Mesh strokeMesh = Tubular.Ribbon.Build(s.Curve, tubularSegments, 5*colliderRadius);
 
          // Assign the generated mesh
-        s.SetMesh(strokeMesh);
+        //s.SetMesh(strokeMesh);
 
-        s.UpdateCollider(strokeMesh);
+        //s.UpdateCollider(strokeMesh);
     }
 
     public bool AddConstraint(Vector3 collisionPos, GameObject collided)
@@ -366,7 +363,7 @@ public class DrawController : MonoBehaviour
                 if (obj.CompareTag("FinalStroke") && obj.GetComponent<FinalStroke>() != null)
                 {
                     // Add stroke/stroke constraint insteand
-                    constraint = obj.GetComponent<FinalStroke>().GetConstraint(pos, parameters.Current.SnapToExistingNodeThreshold);
+                    //constraint = obj.GetComponent<FinalStroke>().GetConstraint(pos, parameters.Current.SnapToExistingNodeThreshold);
                     prioritary = obj;
                 }
                 // Second prioritary is mirror plane

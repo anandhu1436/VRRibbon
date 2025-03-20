@@ -59,20 +59,20 @@ public class ExportController : MonoBehaviour
         if (ExportFinalStrokes)
         {
             Debug.Log("[EXPORT] Exporting sketch as .curves (final strokes).");
-            ExportToCurves(fileName, finalStrokes: true); // default file name
+            //ExportToCurves(fileName, finalStrokes: true); // default file name
 
         }
 
         if (ExportInputStrokes)
         {
             Debug.Log("[EXPORT] Exporting sketch as .curves (input strokes).");
-            ExportToCurves(fileName, finalStrokes: false); // default file name
+            //ExportToCurves(fileName, finalStrokes: false); // default file name
         }
 
         if (ExportGraphData)
         {
             Debug.Log("[EXPORT] Exporting graph data as JSON file.");
-            ExportCurveNetwork(fileName);
+            //ExportCurveNetwork(fileName);
         }
 
         if (ClearAfterExport)
@@ -98,19 +98,25 @@ public class ExportController : MonoBehaviour
         if (canvas.Strokes.Count > 0)
         {
             string fileNameStrokes = name + "_strokes" + ".obj";
+            string fileNameStrokes2 = name + "_points" + ".obj";
             string fullfileNameStrokes = Path.Combine(path, fileNameStrokes);
+            string fullfileNameStrokes2 = Path.Combine(path, fileNameStrokes2);
             File.Create(fullfileNameStrokes).Dispose();
+            File.Create(fullfileNameStrokes2).Dispose();
+            Debug.Log($"counting {canvas.Strokes.Count}");
+
 
             string curves = "";
+            string curves2 = "";
             ObjExporterScript.Start();
 
             foreach (FinalStroke s in canvas.Strokes)
             {
                 // First compute the mesh for the stroke
                 //Mesh mesh = StrokeBrush.Solidify(s.Curve);
-                int tubularSegments = Mathf.CeilToInt(s.Curve.GetLength() * SubdivisionsPerUnit);
+               
 
-                Mesh mesh = Tubular.Ribbon.Build(s.Curve, tubularSegments, 10*StrokeWidth);
+                Mesh mesh = s.GetGeneratedMesh();
 
                 // Add stroke ID as a group name
 
@@ -122,12 +128,53 @@ public class ExportController : MonoBehaviour
                                         objectSpace: true);
                 curves += objString;
 
-                // Store ID
-                if (s as FinalStroke != null)
-                    strokeIDs.Add(((FinalStroke)s).ID);
+                //
+                strokeIDs.Add(s.ID);
+
+                List<Vector3> vertices = new List<Vector3>();
+                List<Vector3> normals = new List<Vector3>();
+                List<int> triangles = new List<int>(); // Indices for mesh
+
+                // Iterate over samples and extract position & normal
+                List<Sample> samples = s.inputsampleSamples;
+                for (int i = 0; i < samples.Count; i++)
+                {
+                    Sample sample = samples[i];
+
+                    vertices.Add(sample.position2); // Store position
+                    normals.Add(sample.normal2);   // Store normal
+                }
+
+                // Create a simple triangulation (e.g., connecting consecutive points)
+               
+                // Create a new mesh
+                Mesh sampleMesh = new Mesh();
+                sampleMesh.SetVertices(vertices);
+                sampleMesh.SetNormals(normals);
+                //sampleMesh.SetTriangles(triangles, 0);
+
+                // Add stroke ID as a group name
+                curves2 += string.Format("g SampleMesh_{0}\n", s.ID);
+
+                // Convert the mesh to an OBJ string
+                string objString2 = ObjExporterScript.MeshToString(
+                                        sampleMesh,
+                                        s.GetComponent<Transform>(),
+                                        objectSpace: true);
+
+                curves2 += objString2;
             }
+            
+
+
             ObjExporterScript.End();
             File.WriteAllText(fullfileNameStrokes, curves);
+            File.WriteAllText(fullfileNameStrokes2, curves2);
+
+
+
+
+
         }
 
 

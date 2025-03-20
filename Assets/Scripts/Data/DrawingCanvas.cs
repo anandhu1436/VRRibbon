@@ -65,7 +65,6 @@ public class DrawingCanvas : MonoBehaviour
         StrokeContainer = new GameObject("Stroke Container");
         StrokeContainer.transform.parent = gameObject.transform;
         SurfaceContainer = new GameObject("Surface Container");
-        SurfaceContainer.transform.parent = gameObject.transform;
 
 
 
@@ -262,25 +261,28 @@ public class DrawingCanvas : MonoBehaviour
 
         foreach (var stroke in Strokes)
         {
-            List<Sample> Samples = stroke.inputsampleSamples;
-            for (int i = 0; i < Samples.Count; i++)
+            List<Sample> tempSamples = stroke.inputsampleSamples;
+            for (int i = 0; i < tempSamples.Count; i++)
             {
-                Sample s = Samples[i];
+                Sample s = tempSamples[i];
 
-                pointsList.Add(new CircumSphereTest.Point3D { x = s.position.x, y = s.position.y, z = s.position.z });
-                normalsList.Add(new CircumSphereTest.Point3D { x = s.normal.x, y = s.normal.y, z = s.normal.z });
+                pointsList.Add(new CircumSphereTest.Point3D { x = s.position2.x, y = s.position2.y, z = s.position2.z });
+                normalsList.Add(new CircumSphereTest.Point3D { x = s.normal2.x, y = s.normal2.y, z = s.normal2.z });
             }
         }
 
         int numPoints = pointsList.Count;
         if (numPoints == 0) return;
 
-        CircumSphereTest.Point3D[] outCenters = new CircumSphereTest.Point3D[10];
-        double[] outRadii = new double[10];
+        int maxsize = 10000;
+        CircumSphereTest.Point3D[] outCenters = new CircumSphereTest.Point3D[maxsize];
+        double[] outRadii = new double[maxsize];
 
-        int count = CircumSphereTest.computeCircumspheres(pointsList.ToArray(), normalsList.ToArray(), numPoints, outCenters, outRadii, 10);
+        int count = CircumSphereTest.computeCircumspheres(pointsList.ToArray(), normalsList.ToArray(), numPoints, outCenters, outRadii, maxsize);
 
         Debug.Log($"Computed {count} Circumspheres");
+
+        Debug.Assert(maxsize != count,"maximum size for dll call");
 
         for (int i = 0; i < count; i++)
         {
@@ -291,9 +293,14 @@ public class DrawingCanvas : MonoBehaviour
             sphereRadii.Add(radius);
 
             // Create a sphere GameObject
-            GameObject sphere = Instantiate(spherePrefab, center, Quaternion.identity, transform);
+
+
+            GameObject sphere = Create(spherePrefab, Primitive.Stroke); // Assuming spheres are related to strokes
+            sphere.transform.localPosition = center;
             sphere.transform.localScale = Vector3.one * radius * 2; // Diameter = 2 * radius
             sphereObjects.Add(sphere);
+
+
         }
     }
 
@@ -304,7 +311,8 @@ public class DrawingCanvas : MonoBehaviour
         Vector3 pos = transform.InverseTransformPoint(worldPos);
 
         bool lookAtNonManifold = false;
-        bool success = Graph.TryFindCycleAt(pos, lookAtNonManifold);
+        bool success = Graph.TryFindCycleAt(pos, lookAtNonManifold); 
+
         if (!success)
         {
             lookAtNonManifold = true;
@@ -453,7 +461,7 @@ public class DrawingCanvas : MonoBehaviour
 
     private void GraphUpdate()
     {
-        //ComputeAndStoreCircumspheres();
+        ComputeAndStoreCircumspheres();
         // Update cycles
         Graph.TryFindAllCycles();
 

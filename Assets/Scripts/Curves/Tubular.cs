@@ -120,6 +120,7 @@ namespace Tubular {
     //     }
 
     // }
+    // not using anywhere
     public class Ribbon {
         public static Mesh Build(Curve.Curve curve, int segments, float width, Color? baseColor = null)
         {
@@ -135,7 +136,7 @@ namespace Tubular {
             {
                 float u = (float)i / segments;
                 Vector3 p = curve.GetPoint(u);
-                Vector3 normal = frames[i].Tangent;
+                Vector3 normal = frames[i].Normal;
                 
                 Vector3 left = p - (normal * (width * 0.5f));
                 Vector3 right = p + (normal * (width * 0.5f));

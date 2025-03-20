@@ -9,6 +9,8 @@ public class Sample
     public Vector3 tangent;
     public float pressure;
     public Vector3 velocity;
+    public Vector3 position2;
+    public Vector3 normal2;
     public float CreationTime { get; }
 
     public Sample(Vector3 position, Vector3 normal, Vector3 tangent, float pressure, Vector3 velocity)
@@ -18,7 +20,10 @@ public class Sample
         this.tangent = tangent;
         this.pressure = pressure;
         this.velocity = velocity;
+        this.position2 = position;
+        this.normal2 = normal;
         this.CreationTime = Time.time;
+
     }
 
     public void LaplacianSmooth(Sample sA, Sample sB)

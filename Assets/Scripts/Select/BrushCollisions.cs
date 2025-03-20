@@ -57,7 +57,7 @@ public class BrushCollisions : MonoBehaviour
         if (Collided)
             collidedQueue.Add(Collided);
         // Trigger change of main collided object
-        OnCollidedChange(other);
+        //OnCollidedChange(other);
 
         //Debug.Log("entering " + other.tag);
     }
