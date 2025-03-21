@@ -1,0 +1,15 @@
+
+=== Thu Feb 20 09:40:41 2025
+
+Packages were changed.
+Update Mode: resetToDefaultDependencies
+
+The following packages were updated:
+  com.unity.timeline from version 1.2.6 to 1.2.14
+The following packages were removed:
+  com.unity.ext.nunit@1.0.0
+  com.unity.quicksearch@3.0.0-preview.26
+  com.unity.recorder@2.4.0-preview.1
+  com.unity.xr.legacyinputhelpers@2.0.6
+  com.unity.xr.openvr.standalone@2.0.5
+  io.extendreality.vrtk.prefabs@1.1.8
