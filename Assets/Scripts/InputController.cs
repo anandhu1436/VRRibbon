@@ -98,6 +98,13 @@ public class InputController : MonoBehaviour
     private bool waitingForConfirm = false;
     private bool lookingAtExample = false;
 
+    private GameObject forwardLineObject;
+private LineRenderer forwardLine;
+
+private GameObject upLineObject;
+private LineRenderer upLine;
+public float lineLength = 0.05f;
+
 
     private float lastContinueInputTime;
 
@@ -140,7 +147,17 @@ public class InputController : MonoBehaviour
             secondarySource = SteamVR_Input_Sources.LeftHand;
         }
     }
-
+    // Helper function to configure LineRenderers
+    private void SetupLineRenderer(LineRenderer line, Color color)
+    {
+        line.startWidth = 0.002f;
+        line.endWidth = 0.001f;
+        line.material = new Material(Shader.Find("Sprites/Default"));
+        line.startColor = color;
+        line.endColor = color;
+        line.positionCount = 2;
+        line.useWorldSpace = true;
+    }
     private void Start()
     {
         StudyScenario.setStudyStepEvent.AddListener(OnStepChange);
@@ -148,13 +165,38 @@ public class InputController : MonoBehaviour
         // Set up controller cheatsheet
         controllerType = StudyUtils.GetControllerType();
         instructionsDisplay.SetControllers(controllerType, StudyUtils.IsRightHandedConfig());
+
+         // Create GameObject for Forward Line
+    forwardLineObject = new GameObject("ForwardLine");
+    forwardLineObject.transform.parent = this.transform;
+    forwardLine = forwardLineObject.AddComponent<LineRenderer>();
+    SetupLineRenderer(forwardLine, Color.green); // Green for forward
+
+    // Create GameObject for Up Line
+    upLineObject = new GameObject("UpLine");
+    upLineObject.transform.parent = this.transform;
+    upLine = upLineObject.AddComponent<LineRenderer>();
+    SetupLineRenderer(upLine, Color.blue); // Blue for up
     }
+
 
 
     // Update is called once per frame
     void Update()
     {
+        Vector3 pos2 = Pos(primarySource);  // Get controller position
+        Quaternion rot2 = Rot(primarySource); // Get controller rotation
 
+        Vector3 forwardDirection = rot2 * Vector3.forward; // Forward vector
+        Vector3 upDirection = rot2 * Vector3.up; // Up vector
+
+        // Update Forward Line (Green)
+        forwardLine.SetPosition(0, pos2);
+        forwardLine.SetPosition(1, pos2 + forwardDirection * lineLength);
+
+        // Update Up Line (Blue)
+        upLine.SetPosition(0, pos2 - upDirection * lineLength);
+        upLine.SetPosition(1, pos2 + upDirection * lineLength);
         // SPECIAL MODES (ignore all input)
         if (isInBreakMode || waitingForConfirm)
             return;
@@ -232,7 +274,9 @@ public class InputController : MonoBehaviour
             {
                 // Toggle grid state
                 //Debug.Log("toggle grid state");
-                grid.ToggleGridState();
+                // grid.ToggleGridState();
+                canvas.displaySpheres=!canvas.displaySpheres;
+                canvas.UpdateSpheres();
             }
             else if (toggleMirror.GetStateDown(secondarySource) && mirrorAvailable)
             {

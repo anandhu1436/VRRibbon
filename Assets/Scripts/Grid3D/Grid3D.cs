@@ -66,7 +66,7 @@ public class Grid3D : MonoBehaviour
         //possibleStates.AddLast(new GridState(true, !DisplayGridLines));
         possibleStates.AddLast(new GridState(false, false));
 
-        state = possibleStates.First;
+        state = possibleStates.Last;
 
         // From desired grid properties,
         // Compute grid anchor position and grid bounds

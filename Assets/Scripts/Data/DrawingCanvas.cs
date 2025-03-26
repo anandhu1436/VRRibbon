@@ -55,6 +55,7 @@ public class DrawingCanvas : MonoBehaviour
 
 
     public Vector3[] OrthoDirections { get; private set; }
+    public bool displaySpheres=true;
 
     private void Start()
     {
@@ -255,7 +256,8 @@ public class DrawingCanvas : MonoBehaviour
 
         sphereCenters.Clear();
         sphereRadii.Clear();
-
+        if (displaySpheres)
+        {
         List<CircumSphereTest.Point3D> pointsList = new List<CircumSphereTest.Point3D>();
         List<CircumSphereTest.Point3D> normalsList = new List<CircumSphereTest.Point3D>();
 
@@ -301,6 +303,7 @@ public class DrawingCanvas : MonoBehaviour
             sphereObjects.Add(sphere);
 
 
+        }
         }
     }
 
@@ -476,4 +479,10 @@ public class DrawingCanvas : MonoBehaviour
         }
 
     }
+     public void UpdateSpheres()
+    {
+        ComputeAndStoreCircumspheres();
+    }
+
+    
 }

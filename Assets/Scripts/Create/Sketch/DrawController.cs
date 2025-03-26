@@ -16,7 +16,7 @@ public class DrawController : MonoBehaviour
     private CASSIEParametersProvider parameters = null;
 
     // BEAUTIFIER
-    public Beautifier beautifier;
+    // public Beautifier beautifier;
 
     // SCENE DATA
     public DrawingCanvas canvas;
