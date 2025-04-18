@@ -120,16 +120,27 @@ public class ExportController : MonoBehaviour
 
                 // Add stroke ID as a group name
 
-                curves += string.Format("g {0}\n", s.ID);
-
+                curves += string.Format("g SampleMesh_{0}\n", s.ID);
                 string objString = ObjExporterScript.MeshToString(
                                         mesh,
                                         s.GetComponent<Transform>(),
                                         objectSpace: true);
                 curves += objString;
 
-                //
+                                //
                 strokeIDs.Add(s.ID);
+
+            }
+             ObjExporterScript.End();
+
+            
+             File.WriteAllText(fullfileNameStrokes, curves);
+             
+
+             
+             ObjExporterScript.Start();
+            foreach (FinalStroke s in canvas.Strokes)
+            {
 
                 List<Vector3> vertices = new List<Vector3>();
                 List<Vector3> normals = new List<Vector3>();
@@ -163,19 +174,34 @@ public class ExportController : MonoBehaviour
                                         objectSpace: true);
 
                 curves2 += objString2;
-            }
-            
+                                //
+                strokeIDs.Add(s.ID);
 
+            }
 
             ObjExporterScript.End();
-            File.WriteAllText(fullfileNameStrokes, curves);
             File.WriteAllText(fullfileNameStrokes2, curves2);
 
 
-
-
-
         }
+
+        string referencemesh = name + "_refernce" + ".obj";
+        string fullfileNameStrokes3 = Path.Combine(path, referencemesh);
+        File.Create(fullfileNameStrokes3).Dispose();
+
+        if (canvas.referencemesh != null)
+        {
+            ObjExporterScript.Start();
+            string objString3 = ObjExporterScript.MeshToString(
+                                    canvas.referencemesh,
+                                    transform,
+                                    objectSpace: true);
+
+            ObjExporterScript.End();
+
+            File.WriteAllText(fullfileNameStrokes3, objString3);
+        }
+
 
 
         // PATCHES

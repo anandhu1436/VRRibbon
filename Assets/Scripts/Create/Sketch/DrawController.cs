@@ -2,6 +2,8 @@ using UnityEngine;
 using Curve;
 using VRSketch;
 using System.Collections.Generic;
+using System.IO;
+
 
 public class DrawController : MonoBehaviour
 {
@@ -23,6 +25,7 @@ public class DrawController : MonoBehaviour
     public SurfaceManager surfaceManager;
     public Grid3D grid;
     public MirrorPlane mirrorPlane;
+    public Material ReferenceMaterial;
 
     // Reference to check for collisions on stroke start
     public BrushCollisions collisionDetector;
@@ -39,6 +42,8 @@ public class DrawController : MonoBehaviour
     private int finalStrokeID = 0;
     private InputStroke currentStroke = null;
     private int currentSelectedPatchID = -1;
+    private GameObject loadedMeshObject = null;
+
 
     private void Start()
     {
@@ -59,6 +64,48 @@ public class DrawController : MonoBehaviour
         // Set parameter
         canvas.SwitchSystem(surfacing);
     }
+    public void LoadAndDisplayOBJ(string path)
+    {
+        if (!File.Exists(path))
+        {
+            Debug.LogError("OBJ file not found at " + path);
+            return;
+        }
+
+        string objText = File.ReadAllText(path);
+        Mesh mesh = OBJLoaderHelper.LoadOBJ(objText);
+
+        if (mesh == null)
+        {
+            Debug.LogError("Failed to load mesh from OBJ file.");
+            return;
+        }
+
+        if (loadedMeshObject != null)
+            Destroy(loadedMeshObject); // Remove previous mesh if exists
+
+        loadedMeshObject = new GameObject("LoadedOBJ");
+        loadedMeshObject.transform.SetParent(canvas.transform, worldPositionStays: false);
+        MeshFilter filter = loadedMeshObject.AddComponent<MeshFilter>();
+        filter.mesh = mesh;
+        MeshRenderer renderer = loadedMeshObject.AddComponent<MeshRenderer>();
+        renderer.material = ReferenceMaterial;
+        canvas.referencemesh=mesh;
+    }
+
+
+    public void ShowMesh()
+    {
+        if (loadedMeshObject != null)
+            loadedMeshObject.SetActive(true);
+    }
+
+    public void HideMesh()
+    {
+        if (loadedMeshObject != null)
+            loadedMeshObject.SetActive(false);
+    }
+
 
     public void NewStroke(Vector3 position)
     {

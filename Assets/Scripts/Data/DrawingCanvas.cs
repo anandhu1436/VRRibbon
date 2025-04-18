@@ -33,6 +33,7 @@ public class DrawingCanvas : MonoBehaviour
     private GameObject StrokeContainer;
     private GameObject SurfaceContainer;
     private Grid3D grid;
+    public Mesh referencemesh;
 
     // Display nodes stuff
     [Header("Node Display Shader")]

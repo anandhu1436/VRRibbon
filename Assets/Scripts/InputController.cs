@@ -72,7 +72,7 @@ public class InputController : MonoBehaviour
     public InstructionsDisplay instructionsDisplay;
     public ControllerType controllerType = ControllerType.Vive;
     public bool ShowInstructions = true;
-    public bool ShowModel = true;
+    public bool ShowModel = false;
 
     // Canvas transform
     //public Transform canvasTransform;
@@ -99,11 +99,14 @@ public class InputController : MonoBehaviour
     private bool lookingAtExample = false;
 
     private GameObject forwardLineObject;
-private LineRenderer forwardLine;
+    private LineRenderer forwardLine;
 
-private GameObject upLineObject;
-private LineRenderer upLine;
+    private GameObject upLineObject;
+    private LineRenderer upLine;
 public float lineLength = 0.05f;
+    private string ObjFolder = "ObjData~";
+    private string[] objFiles;
+    private int currentObjIndex = 0;
 
 
     private float lastContinueInputTime;
@@ -167,20 +170,22 @@ public float lineLength = 0.05f;
         instructionsDisplay.SetControllers(controllerType, StudyUtils.IsRightHandedConfig());
 
          // Create GameObject for Forward Line
-    forwardLineObject = new GameObject("ForwardLine");
-    forwardLineObject.transform.parent = this.transform;
-    forwardLine = forwardLineObject.AddComponent<LineRenderer>();
-    SetupLineRenderer(forwardLine, Color.green); // Green for forward
+        forwardLineObject = new GameObject("ForwardLine");
+        forwardLineObject.transform.parent = this.transform;
+        forwardLine = forwardLineObject.AddComponent<LineRenderer>();
+        SetupLineRenderer(forwardLine, Color.green); // Green for forward
 
-    // Create GameObject for Up Line
-    upLineObject = new GameObject("UpLine");
-    upLineObject.transform.parent = this.transform;
-    upLine = upLineObject.AddComponent<LineRenderer>();
-    SetupLineRenderer(upLine, Color.blue); // Blue for up
+        // Create GameObject for Up Line
+        upLineObject = new GameObject("UpLine");
+        upLineObject.transform.parent = this.transform;
+        upLine = upLineObject.AddComponent<LineRenderer>();
+        SetupLineRenderer(upLine, Color.blue); // Blue for up
+
+        string objFolderPath = Path.Combine(Application.dataPath, ObjFolder);
+        objFiles = Directory.GetFiles(objFolderPath, "*.obj");
+
+
     }
-
-
-
     // Update is called once per frame
     void Update()
     {
@@ -210,7 +215,7 @@ public float lineLength = 0.05f;
         Vector3 drawingPos = pos;
 
         // Refresh objects appearance
-        grid.Refresh(pos);
+        // grid.Refresh(pos);
         sketchModelController.UpdateHandPos(pos);
 
         if (currentAction.Equals(Action.Idle))
@@ -236,7 +241,7 @@ public float lineLength = 0.05f;
                 primaryHandAppearance.OnZoomStart();
                 secondaryHandAppearance.OnZoomStart();
                 zoomInteractionAppearance.OnZoomStart(Pos(primarySource), Pos(secondarySource));
-                grid.OnTransformStart();
+                // grid.OnTransformStart();
                 float handsDistance = Vector3.Distance(Pos(primarySource), Pos(secondarySource));
                 zoomController.StartZoom(handsDistance);
             }
@@ -266,7 +271,7 @@ public float lineLength = 0.05f;
             {
                 currentAction = Action.Grab;
                 secondaryHandAppearance.OnGrabStart();
-                grid.OnTransformStart();
+                // grid.OnTransformStart();
                 grabController.GrabStart(Pos(secondarySource), Rot(secondarySource));
             }
 
@@ -297,6 +302,18 @@ public float lineLength = 0.05f;
                 int newSystemID = (currentSystemID + 2) % 4; // Switch between freehand and patch
                 OnSystemChange((SketchSystem)newSystemID, clearCanvas: false);
                 UpdateInstructions();
+                 OnModelChange(scenario.CurrentStep.Model);
+                if (objFiles.Length > 0)
+                {
+                    string path = objFiles[currentObjIndex];
+                    drawController.LoadAndDisplayOBJ(path);
+
+                    currentObjIndex = (currentObjIndex + 1) % objFiles.Length;
+                }
+               
+
+
+
                 hapticAction.Execute(0f, 0.1f, 25, 5, secondarySource);
             }
 
@@ -339,7 +356,7 @@ public float lineLength = 0.05f;
             {
                 currentAction = Action.Idle;
                 secondaryHandAppearance.OnGrabEnd();
-                grid.OnTransformEnd();
+                // grid.OnTransformEnd();
 
                 // Log data
                 scenario.CurrentStep.CanvasTransform(headTransform, Pos(primarySource), canvas.transform, mirroring);
@@ -347,7 +364,7 @@ public float lineLength = 0.05f;
             else
             {
                 grabController.GrabUpdate(Pos(secondarySource), Rot(secondarySource));
-                grid.OnCanvasMove();
+                // grid.OnCanvasMove();
             }
         }
 
@@ -359,7 +376,7 @@ public float lineLength = 0.05f;
                 zoomInteractionAppearance.OnZoomEnd();
                 primaryHandAppearance.OnZoomEnd();
                 secondaryHandAppearance.OnZoomEnd();
-                grid.OnTransformEnd();
+                // grid.OnTransformEnd();
 
                 // Log data
                 scenario.CurrentStep.CanvasTransform(headTransform, Pos(primarySource), canvas.transform, mirroring);
@@ -392,7 +409,7 @@ public float lineLength = 0.05f;
 #endif
         }
 
-        if (!lookingAtExample && studyNextAction.GetStateUp(SteamVR_Input_Sources.Any))
+        if (!lookingAtExample && studyNextAction.GetStateUp(primarySource))
         {
             Debug.Log("on to the next step");
             waitingForConfirm = true;
@@ -400,6 +417,23 @@ public float lineLength = 0.05f;
             StartCoroutine("WaitForConfirm");
 
         }
+        if (!lookingAtExample && studyNextAction.GetStateUp(secondarySource))
+        {
+            if (ShowModel)
+            {
+                ShowModel = false;
+                drawController.ShowMesh();
+            }
+            else
+            {
+                ShowModel = true;
+                drawController.HideMesh();
+
+            }
+
+
+        }
+
 
 
         if (Input.GetKeyUp(saveStudyLogKey))
@@ -683,9 +717,9 @@ public float lineLength = 0.05f;
         // If a mirror plane is defined, activate it
         if (StudyUtils.MirrorModelMapping.TryGetValue(model, out VRSketch.Plane plane))
         {
-            mirroring = true;
-            mirrorAvailable = true;
-            mirrorPlane.SetPlane(plane.n, plane.p0 + origin);
+            mirroring = false;
+            mirrorAvailable = false;
+            // mirrorPlane.SetPlane(plane.n, plane.p0 + origin);
         }
         else
         {
@@ -712,6 +746,7 @@ public float lineLength = 0.05f;
             }
 
         }
+        Debug.Log("loaded the first model");
 
     }
 
@@ -727,17 +762,19 @@ public float lineLength = 0.05f;
 
 
         string instructions = "";
-        instructions += StudyUtils.SystemInstructions[this.sketchSystem];
-        instructions += "\n";
-        instructions += "\n";
-        instructions += StudyUtils.InteractionModeInstructions[this.mode];
+        // instructions += "1.Create a sphere shape and export";
+        // instructions += "\n";
+        // instructions += "2.Create a cube shape and export";
+        // instructions += "\n";
+        // instructions += "3.Create a torus shape and export";
+        // instructions += "\n";
+        // instructions += "4.Create a wooden dog(press switch refrence) and export";
+        // instructions += "\n";
+        // instructions += "5.Create a Rubber duck(press switch refrence, ignore eyes) and export";
+        //  instructions += "\n";
+        // instructions += "6.Explore your creativity- try any reference model";
+        // instructions += StudyUtils.InteractionModeInstructions[this.mode];
 
-        if (!this.mode.Equals(VRSketch.InteractionMode.FreeCreation))
-        {
-            instructions += "\n";
-            instructions += "\n";
-            instructions += "Model: " + StudyUtils.ModelNames[this.sketchModel];
-        }
 
         instructionsDisplay.SetText(instructions);
     }

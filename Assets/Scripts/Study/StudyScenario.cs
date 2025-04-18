@@ -21,6 +21,8 @@ public class StudyScenario : MonoBehaviour
         // Load study data
         StudyUtils.TryLoadStudyData(out sequenceData);
 
+        Debug.Log("loaded sudy data");
+
         setStudyStepEvent = new UnityEvent();
     }
 
