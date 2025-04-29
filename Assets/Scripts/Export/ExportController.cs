@@ -152,8 +152,8 @@ public class ExportController : MonoBehaviour
                 {
                     Sample sample = samples[i];
 
-                    vertices.Add(sample.position2); // Store position
-                    normals.Add(sample.normal2);   // Store normal
+                    vertices.Add(sample.position); // Store position
+                    normals.Add(sample.normal);   // Store normal
                 }
 
                 // Create a simple triangulation (e.g., connecting consecutive points)

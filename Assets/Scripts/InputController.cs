@@ -192,8 +192,8 @@ public float lineLength = 0.05f;
         Vector3 pos2 = Pos(primarySource);  // Get controller position
         Quaternion rot2 = Rot(primarySource); // Get controller rotation
 
-        Vector3 forwardDirection = rot2 * Vector3.forward; // Forward vector
-        Vector3 upDirection = rot2 * Vector3.up; // Up vector
+        Vector3 forwardDirection = rot2 * Vector3.right; // Forward vector
+        Vector3 upDirection = rot2 * Vector3.forward; // Up vector
 
         // Update Forward Line (Green)
         forwardLine.SetPosition(0, pos2);
@@ -201,7 +201,7 @@ public float lineLength = 0.05f;
 
         // Update Up Line (Blue)
         upLine.SetPosition(0, pos2 - upDirection * lineLength);
-        upLine.SetPosition(1, pos2 + upDirection * lineLength);
+        upLine.SetPosition(1, pos2 + upDirection * 0);
         // SPECIAL MODES (ignore all input)
         if (isInBreakMode || waitingForConfirm)
             return;

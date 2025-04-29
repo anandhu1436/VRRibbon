@@ -121,54 +121,54 @@ namespace Tubular {
 
     // }
     // not using anywhere
-    public class Ribbon {
-        public static Mesh Build(Curve.Curve curve, int segments, float width, Color? baseColor = null)
-        {
-            Color test=new Color(0.0f, 0.0f, 1.0f);
-            Color color = baseColor ?? test;
-            var vertices = new List<Vector3>();
-            var normals = new List<Vector3>();
-            var indices = new List<int>();
-            var uvs = new List<Vector2>();
-            var frames = curve.ComputeFrenetFrames(segments, Vector3.zero, false);
+    // public class Ribbon {
+    //     public static Mesh Build(Curve.Curve curve, int segments, float width, Color? baseColor = null)
+    //     {
+    //         Color test=new Color(0.0f, 0.0f, 1.0f);
+    //         Color color = baseColor ?? test;
+    //         var vertices = new List<Vector3>();
+    //         var normals = new List<Vector3>();
+    //         var indices = new List<int>();
+    //         var uvs = new List<Vector2>();
+    //         var frames = curve.ComputeFrenetFrames(segments, Vector3.zero, false);
 
-            for (int i = 0; i < segments; i++)
-            {
-                float u = (float)i / segments;
-                Vector3 p = curve.GetPoint(u);
-                Vector3 normal = frames[i].Normal;
+    //         for (int i = 0; i < segments; i++)
+    //         {
+    //             float u = (float)i / segments;
+    //             Vector3 p = curve.GetPoint(u);
+    //             Vector3 normal = frames[i].Normal;
                 
-                Vector3 left = p - (normal * (width * 0.5f));
-                Vector3 right = p + (normal * (width * 0.5f));
+    //             Vector3 left = p - (normal * (width * 0.5f));
+    //             Vector3 right = p + (normal * (width * 0.5f));
                 
-                vertices.Add(left);
-                vertices.Add(right);
-                normals.Add(normal);
-                normals.Add(normal);
+    //             vertices.Add(left);
+    //             vertices.Add(right);
+    //             normals.Add(normal);
+    //             normals.Add(normal);
                 
-                uvs.Add(new Vector2(0, u));
-                uvs.Add(new Vector2(1, u));
-            }
+    //             uvs.Add(new Vector2(0, u));
+    //             uvs.Add(new Vector2(1, u));
+    //         }
 
-            for (int i = 0; i < segments - 1; i++)
-            {
-                int a = i * 2;
-                int b = a + 1;
-                int c = a + 2;
-                int d = a + 3;
+    //         for (int i = 0; i < segments - 1; i++)
+    //         {
+    //             int a = i * 2;
+    //             int b = a + 1;
+    //             int c = a + 2;
+    //             int d = a + 3;
 
-                indices.Add(a); indices.Add(b); indices.Add(c);
-                indices.Add(b); indices.Add(d); indices.Add(c);
-            }
+    //             indices.Add(a); indices.Add(b); indices.Add(c);
+    //             indices.Add(b); indices.Add(d); indices.Add(c);
+    //         }
 
-            var mesh = new Mesh();
-            mesh.vertices = vertices.ToArray();
-            mesh.normals = normals.ToArray();
-            mesh.uv = uvs.ToArray();
-            mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
-            return mesh;
-        }
-    }
+    //         var mesh = new Mesh();
+    //         mesh.vertices = vertices.ToArray();
+    //         mesh.normals = normals.ToArray();
+    //         mesh.uv = uvs.ToArray();
+    //         mesh.SetIndices(indices.ToArray(), MeshTopology.Triangles, 0);
+    //         return mesh;
+    //     }
+    // }
 }
 
 

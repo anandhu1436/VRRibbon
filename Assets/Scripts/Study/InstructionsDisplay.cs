@@ -121,8 +121,8 @@ public class InstructionsDisplay : MonoBehaviour
             label.fontSize = 14;
 
             // Hide cheatsheets
-            LeftHandCheatSheet.enabled = true;
-            RightHandCheatSheet.enabled = true;
+            LeftHandCheatSheet.enabled = false;
+            RightHandCheatSheet.enabled = false;
         }
     }
 

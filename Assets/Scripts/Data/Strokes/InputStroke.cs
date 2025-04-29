@@ -53,8 +53,8 @@ public class InputStroke : Stroke
         {
             Sample s = Samples[i];
 
-            Vector3 left = s.position - (s.tangent * (width));
-            Vector3 right = s.position + (s.tangent * (width ));
+            Vector3 left = s.position - (s.width * (width));
+            Vector3 right = s.position + (s.width * (width ));
 
             vertices.Add(left);
             vertices.Add(right);
@@ -73,8 +73,24 @@ public class InputStroke : Stroke
             int c = a + 2;
             int d = a + 3;
 
+             // Compare sample tangent with controller tangent
+        Vector3 sampleTangent = (Samples[i + 1].position - Samples[i].position).normalized;
+        float dot = Vector3.Dot(sampleTangent, Samples[i].tangent);
+
+        if (dot >= 0)
+        {
+            // Same direction, normal winding
+             // Opposite direction, flip winding
+            indices.Add(a); indices.Add(c); indices.Add(b);
+            indices.Add(b); indices.Add(c); indices.Add(d);
+           
+        }
+        else
+        {
+            // Opposite direction, flip winding
             indices.Add(a); indices.Add(b); indices.Add(c);
             indices.Add(b); indices.Add(d); indices.Add(c);
+        }
         }
 
         Mesh mesh = new Mesh

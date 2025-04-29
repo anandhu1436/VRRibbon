@@ -130,13 +130,16 @@ public class DrawController : MonoBehaviour
         // Check if current selected patch is still nearby
         UpdateSelectedPatch(position);
 
-        Vector3 brushNormal = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 0, -1)); // seems fine
         Vector3 brushtangent = canvas.transform.InverseTransformDirection(rotation * new Vector3(0, 1, 0)); // seems fine
+        Vector3 brushNormal = canvas.transform.InverseTransformDirection(rotation * Vector3.right); // seems fine
+
+        Vector3 brushWidth=canvas.transform.InverseTransformDirection(rotation *  Vector3.forward); // seems fine
         Vector3 relativePos = canvas.transform.InverseTransformPoint(position);
 
+        
         //Debug.DrawLine(samplePos, samplePos + brushNormal * 0.1f, Color.white, 100f);
 
-        Sample s = new Sample(relativePos, brushNormal, brushtangent, pressure, velocity);
+        Sample s = new Sample(relativePos, brushNormal, brushtangent,brushWidth, pressure, velocity);
 
         currentStroke.AddSample(s);
 

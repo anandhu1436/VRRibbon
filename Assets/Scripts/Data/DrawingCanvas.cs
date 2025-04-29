@@ -269,15 +269,15 @@ public class DrawingCanvas : MonoBehaviour
             {
                 Sample s = tempSamples[i];
 
-                pointsList.Add(new CircumSphereTest.Point3D { x = s.position2.x, y = s.position2.y, z = s.position2.z });
-                normalsList.Add(new CircumSphereTest.Point3D { x = s.normal2.x, y = s.normal2.y, z = s.normal2.z });
+                pointsList.Add(new CircumSphereTest.Point3D { x = s.position.x, y = s.position.y, z = s.position.z });
+                normalsList.Add(new CircumSphereTest.Point3D { x = s.normal.x, y = s.normal.y, z = s.normal.z });
             }
         }
 
         int numPoints = pointsList.Count;
         if (numPoints == 0) return;
 
-        int maxsize = 10000;
+        int maxsize = 90000;
         CircumSphereTest.Point3D[] outCenters = new CircumSphereTest.Point3D[maxsize];
         double[] outRadii = new double[maxsize];
 
