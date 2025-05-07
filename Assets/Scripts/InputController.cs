@@ -201,7 +201,7 @@ public float lineLength = 0.05f;
 
         // Update Up Line (Blue)
         upLine.SetPosition(0, pos2 - upDirection * lineLength);
-        upLine.SetPosition(1, pos2 + upDirection * 0);
+        upLine.SetPosition(1, pos2 + upDirection * lineLength);
         // SPECIAL MODES (ignore all input)
         if (isInBreakMode || waitingForConfirm)
             return;

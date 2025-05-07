@@ -647,6 +647,52 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 60, y: -20, z: 0}
+--- !u!1 &561612156
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 561612157}
+  - component: {fileID: 561612158}
+  m_Layer: 0
+  m_Name: MarchingCube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &561612157
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 561612156}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 1438888051}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &561612158
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 561612156}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93899db29848fd644821755bd74658a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_drawBuffer: {fileID: 2100000, guid: 99125ff1a74b745489673a89bac7fb46, type: 2}
+  m_marchingCubes: {fileID: 7200000, guid: cbefffa4c1505b54689332f612d627e6, type: 3}
+  m_normals: {fileID: 7200000, guid: 8f22bc50351139e4c8c6f8222864a4c2, type: 3}
 --- !u!1 &597166062
 GameObject:
   m_ObjectHideFlags: 0
@@ -757,40 +803,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 561b496d2f97d294dab6ee6da5313d64, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!21 &724105533
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Sprites/Default
-  m_Shader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _AlphaTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - _MainTex:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Floats:
-    - PixelSnap: 0
-    - _EnableExternalAlpha: 0
-    m_Colors:
-    - _Color: {r: 1, g: 1, b: 1, a: 1}
-    - _Flip: {r: 1, g: 1, b: 1, a: 1}
-    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &897057049
 GameObject:
   m_ObjectHideFlags: 0
@@ -1063,6 +1075,40 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!21 &992210199
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Sprites/Default
+  m_Shader: {fileID: 10753, guid: 0000000000000000f000000000000000, type: 0}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _AlphaTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Floats:
+    - PixelSnap: 0
+    - _EnableExternalAlpha: 0
+    m_Colors:
+    - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Flip: {r: 1, g: 1, b: 1, a: 1}
+    - _RendererColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1 &1179324554
 GameObject:
   m_ObjectHideFlags: 0
@@ -1349,6 +1395,12 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1438888048}
   m_Mesh: {fileID: 0}
+--- !u!4 &1438888051 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 65727684909682763, guid: d6db36bb86830e24a993ea5b03df8328,
+    type: 3}
+  m_PrefabInstance: {fileID: 65727684293668858}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1446277685
 GameObject:
   m_ObjectHideFlags: 0
@@ -1671,7 +1723,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e0f23865f5a172469a2a9e761c78d69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!43 &1906365259
+--- !u!43 &1938356130
 Mesh:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1988,6 +2040,11 @@ PrefabInstance:
       propertyPath: spherePrefab
       value: 
       objectReference: {fileID: 597166062}
+    - target: {fileID: 65727684909682762, guid: d6db36bb86830e24a993ea5b03df8328,
+        type: 3}
+      propertyPath: marchingCubes
+      value: 
+      objectReference: {fileID: 561612158}
     - target: {fileID: 65727684909682763, guid: d6db36bb86830e24a993ea5b03df8328,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2230,12 +2287,12 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 724105533}
+      objectReference: {fileID: 992210199}
     - target: {fileID: 6632083072996410872, guid: 9959aaa5fcea91548bbdc004a59e2d3e,
         type: 3}
       propertyPath: m_Mesh
       value: 
-      objectReference: {fileID: 1906365259}
+      objectReference: {fileID: 1938356130}
     - target: {fileID: 6632083072997195554, guid: 9959aaa5fcea91548bbdc004a59e2d3e,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -2316,6 +2373,16 @@ PrefabInstance:
       propertyPath: drawController
       value: 
       objectReference: {fileID: 1967445020}
+    - target: {fileID: 6651510446462384994, guid: 9959aaa5fcea91548bbdc004a59e2d3e,
+        type: 3}
+      propertyPath: m_RenderingPath
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6651510446462384994, guid: 9959aaa5fcea91548bbdc004a59e2d3e,
+        type: 3}
+      propertyPath: m_BackGroundColor.a
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8321049930710831654, guid: 9959aaa5fcea91548bbdc004a59e2d3e,
         type: 3}
       propertyPath: m_Parameters.widthMultiplier

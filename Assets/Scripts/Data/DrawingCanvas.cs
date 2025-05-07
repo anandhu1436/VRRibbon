@@ -1,4 +1,5 @@
 ﻿using Curve;
+// using MarchingCubesGPUProject;
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
@@ -57,6 +58,9 @@ public class DrawingCanvas : MonoBehaviour
 
     public Vector3[] OrthoDirections { get; private set; }
     public bool displaySpheres=true;
+
+    // public MarchingCubesGPU marchingCubes;
+
 
     private void Start()
     {
@@ -302,10 +306,11 @@ public class DrawingCanvas : MonoBehaviour
             sphere.transform.localPosition = center;
             sphere.transform.localScale = Vector3.one * radius * 2; // Diameter = 2 * radius
             sphereObjects.Add(sphere);
-
+            
 
         }
         }
+        // marchingCubes.SetSpheres(sphereCenters, sphereRadii);
     }
 
 
