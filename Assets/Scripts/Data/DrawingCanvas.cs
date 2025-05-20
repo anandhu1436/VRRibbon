@@ -250,67 +250,111 @@ public class DrawingCanvas : MonoBehaviour
         GraphUpdate();
     }
 
-    
+    [SerializeField] private Material surfaceMaterial;  // Assign in Inspector
+    private GameObject currentSurfaceMesh;              // Track existing surface mesh
 
-    private void ComputeAndStoreCircumspheres()
+    private void ComputeAndRenderSurfaceMesh()
     {
-        // Clear previous spheres
-        foreach (var sphere in sphereObjects)
-            Destroy(sphere);
+        // Clear previous surface mesh if any
+        if (currentSurfaceMesh != null)
+        {
+            Destroy(currentSurfaceMesh);
+            currentSurfaceMesh = null;
+        }
+
+        // Clear previous stroke visuals
+        foreach (var obj in sphereObjects)
+            Destroy(obj);
         sphereObjects.Clear();
 
         sphereCenters.Clear();
         sphereRadii.Clear();
-        if (displaySpheres)
-        {
-        List<CircumSphereTest.Point3D> pointsList = new List<CircumSphereTest.Point3D>();
-        List<CircumSphereTest.Point3D> normalsList = new List<CircumSphereTest.Point3D>();
+
+        List<CircumSphereMeshInterface.Point3D> pointsList = new List<CircumSphereMeshInterface.Point3D>();
+        List<CircumSphereMeshInterface.Point3D> normalsList = new List<CircumSphereMeshInterface.Point3D>();
 
         foreach (var stroke in Strokes)
         {
             List<Sample> tempSamples = stroke.inputsampleSamples;
-            for (int i = 0; i < tempSamples.Count; i++)
+            foreach (var s in tempSamples)
             {
-                Sample s = tempSamples[i];
-
-                pointsList.Add(new CircumSphereTest.Point3D { x = s.position.x, y = s.position.y, z = s.position.z });
-                normalsList.Add(new CircumSphereTest.Point3D { x = s.normal.x, y = s.normal.y, z = s.normal.z });
+                pointsList.Add(new CircumSphereMeshInterface.Point3D { x = s.position.x, y = s.position.y, z = s.position.z });
+                normalsList.Add(new CircumSphereMeshInterface.Point3D { x = s.normal.x, y = s.normal.y, z = s.normal.z });
             }
         }
 
         int numPoints = pointsList.Count;
-        if (numPoints == 0) return;
-
-        int maxsize = 90000;
-        CircumSphereTest.Point3D[] outCenters = new CircumSphereTest.Point3D[maxsize];
-        double[] outRadii = new double[maxsize];
-
-        int count = CircumSphereTest.computeCircumspheres(pointsList.ToArray(), normalsList.ToArray(), numPoints, outCenters, outRadii, maxsize);
-
-        Debug.Log($"Computed {count} Circumspheres");
-
-        Debug.Assert(maxsize != count,"maximum size for dll call");
-
-        for (int i = 0; i < count; i++)
+        if (numPoints == 0)
         {
-            Vector3 center = new Vector3((float)outCenters[i].x, (float)outCenters[i].y, (float)outCenters[i].z);
-            float radius = (float)outRadii[i];
-
-            sphereCenters.Add(center);
-            sphereRadii.Add(radius);
-
-            // Create a sphere GameObject
-
-
-            GameObject sphere = Create(spherePrefab, Primitive.Stroke); // Assuming spheres are related to strokes
-            sphere.transform.localPosition = center;
-            sphere.transform.localScale = Vector3.one * radius * 2; // Diameter = 2 * radius
-            sphereObjects.Add(sphere);
-            
-
+            Debug.LogWarning("No input points for surface mesh.");
+            return;
         }
+
+        int maxVertices = 50000;
+        int maxFaces = 50000;
+
+        double[] outVertices = new double[maxVertices * 3];
+        int[] outFaces = new int[maxFaces * 3];
+
+        int outVertexCount, outFaceCount;
+
+        int result = CircumSphereMeshInterface.computeSurfaceMesh(
+            pointsList.ToArray(),
+            normalsList.ToArray(),
+            numPoints,
+            outVertices,
+            outFaces,
+            out outVertexCount,
+            out outFaceCount,
+            maxVertices,
+            maxFaces
+        );
+
+        if (outVertexCount <= 0 || outFaceCount <= 0)
+        {
+            Debug.LogWarning("Surface mesh generation returned no data.");
+            return;
         }
-        // marchingCubes.SetSpheres(sphereCenters, sphereRadii);
+
+       // Convert raw vertex array into Vector3[]
+        Vector3[] meshVertices = new Vector3[outVertexCount];
+        for (int i = 0; i < outVertexCount; i++)
+        {
+            meshVertices[i] = new Vector3(
+                (float)outVertices[3 * i],
+                (float)outVertices[3 * i + 1],
+                (float)outVertices[3 * i + 2]
+            );
+        }
+
+        // Convert raw face indices and fix winding order
+        int[] triangles = new int[outFaceCount * 3];
+        for (int i = 0; i < outFaceCount; i++)
+        {
+            int idx = i * 3;
+            int a = outFaces[idx];
+            int b = outFaces[idx + 1];
+            int c = outFaces[idx + 2];
+
+            // Flip winding to clockwise (Unity expects clockwise for front face)
+            triangles[idx] = a;
+            triangles[idx + 1] = c;
+            triangles[idx + 2] = b;
+        }
+
+        Mesh mesh = new Mesh();
+        mesh.indexFormat = (outVertexCount > 65535) ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
+        mesh.vertices = meshVertices;
+        mesh.triangles = triangles;
+        mesh.RecalculateNormals();
+
+        // Create and parent the surface mesh
+        currentSurfaceMesh = Create(new GameObject("CircumSphereMesh"), Primitive.Stroke);
+        MeshFilter mf = currentSurfaceMesh.AddComponent<MeshFilter>();
+        MeshRenderer mr = currentSurfaceMesh.AddComponent<MeshRenderer>();
+
+        mf.mesh = mesh;
+        mr.material = surfaceMaterial != null ? surfaceMaterial : new Material(Shader.Find("Standard"));
     }
 
 
@@ -470,7 +514,8 @@ public class DrawingCanvas : MonoBehaviour
 
     private void GraphUpdate()
     {
-        ComputeAndStoreCircumspheres();
+        // ComputeAndStoreCircumspheres();
+        ComputeAndRenderSurfaceMesh();
         // Update cycles
         Graph.TryFindAllCycles();
 
@@ -487,7 +532,8 @@ public class DrawingCanvas : MonoBehaviour
     }
      public void UpdateSpheres()
     {
-        ComputeAndStoreCircumspheres();
+        // ComputeAndStoreCircumspheres();
+        ComputeAndRenderSurfaceMesh();
     }
 
     
