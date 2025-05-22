@@ -185,15 +185,15 @@ public class ExportController : MonoBehaviour
 
         }
 
-        string referencemesh = name + "_refernce" + ".obj";
+        string referencemesh = name + "_final" + ".obj";
         string fullfileNameStrokes3 = Path.Combine(path, referencemesh);
         File.Create(fullfileNameStrokes3).Dispose();
 
-        if (canvas.referencemesh != null)
+        if (canvas.finalmesh != null)
         {
             ObjExporterScript.Start();
             string objString3 = ObjExporterScript.MeshToString(
-                                    canvas.referencemesh,
+                                    canvas.finalmesh,
                                     transform,
                                     objectSpace: true);
 

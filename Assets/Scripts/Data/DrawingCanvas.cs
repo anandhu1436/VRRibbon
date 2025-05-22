@@ -58,6 +58,8 @@ public class DrawingCanvas : MonoBehaviour
 
     public Vector3[] OrthoDirections { get; private set; }
     public bool displaySpheres=true;
+    public int displayMode=1;
+    public Mesh finalmesh;
 
     // public MarchingCubesGPU marchingCubes;
 
@@ -250,7 +252,8 @@ public class DrawingCanvas : MonoBehaviour
         GraphUpdate();
     }
 
-    [SerializeField] private Material surfaceMaterial;  // Assign in Inspector
+    [SerializeField] private Material transparentMaterial;  // Assign in Inspector
+    [SerializeField] private Material opaqueMaterial;
     private GameObject currentSurfaceMesh;              // Track existing surface mesh
 
     private void ComputeAndRenderSurfaceMesh()
@@ -267,8 +270,9 @@ public class DrawingCanvas : MonoBehaviour
             Destroy(obj);
         sphereObjects.Clear();
 
-        sphereCenters.Clear();
-        sphereRadii.Clear();
+        if(displayMode%3!=0)
+        {
+
 
         List<CircumSphereMeshInterface.Point3D> pointsList = new List<CircumSphereMeshInterface.Point3D>();
         List<CircumSphereMeshInterface.Point3D> normalsList = new List<CircumSphereMeshInterface.Point3D>();
@@ -342,19 +346,23 @@ public class DrawingCanvas : MonoBehaviour
             triangles[idx + 2] = b;
         }
 
-        Mesh mesh = new Mesh();
-        mesh.indexFormat = (outVertexCount > 65535) ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
-        mesh.vertices = meshVertices;
-        mesh.triangles = triangles;
-        mesh.RecalculateNormals();
+        finalmesh = new Mesh();
+        finalmesh.indexFormat = (outVertexCount > 65535) ? UnityEngine.Rendering.IndexFormat.UInt32 : UnityEngine.Rendering.IndexFormat.UInt16;
+        finalmesh.vertices = meshVertices;
+        finalmesh.triangles = triangles;
+        finalmesh.RecalculateNormals();
 
         // Create and parent the surface mesh
         currentSurfaceMesh = Create(new GameObject("CircumSphereMesh"), Primitive.Stroke);
         MeshFilter mf = currentSurfaceMesh.AddComponent<MeshFilter>();
         MeshRenderer mr = currentSurfaceMesh.AddComponent<MeshRenderer>();
 
-        mf.mesh = mesh;
-        mr.material = surfaceMaterial != null ? surfaceMaterial : new Material(Shader.Find("Standard"));
+        mf.mesh = finalmesh;
+        if(displayMode%3==1)
+            mr.material = transparentMaterial != null ? transparentMaterial : new Material(Shader.Find("Standard"));
+        else
+            mr.material = opaqueMaterial != null ? opaqueMaterial : new Material(Shader.Find("Standard"));
+        }
     }
 
 

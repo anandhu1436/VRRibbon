@@ -215,7 +215,7 @@ public float lineLength = 0.05f;
         Vector3 drawingPos = pos;
 
         // Refresh objects appearance
-        // grid.Refresh(pos);
+        grid.Refresh(pos);
         sketchModelController.UpdateHandPos(pos);
 
         if (currentAction.Equals(Action.Idle))
@@ -241,7 +241,7 @@ public float lineLength = 0.05f;
                 primaryHandAppearance.OnZoomStart();
                 secondaryHandAppearance.OnZoomStart();
                 zoomInteractionAppearance.OnZoomStart(Pos(primarySource), Pos(secondarySource));
-                // grid.OnTransformStart();
+                grid.OnTransformStart();
                 float handsDistance = Vector3.Distance(Pos(primarySource), Pos(secondarySource));
                 zoomController.StartZoom(handsDistance);
             }
@@ -271,17 +271,16 @@ public float lineLength = 0.05f;
             {
                 currentAction = Action.Grab;
                 secondaryHandAppearance.OnGrabStart();
-                // grid.OnTransformStart();
+                grid.OnTransformStart();
                 grabController.GrabStart(Pos(secondarySource), Rot(secondarySource));
             }
 
             else if (toggleGridStateAction.GetStateDown(secondarySource))
             {
                 // Toggle grid state
-                //Debug.Log("toggle grid state");
-                // grid.ToggleGridState();
-                canvas.displaySpheres=!canvas.displaySpheres;
-                canvas.UpdateSpheres();
+                Debug.Log("toggle grid state");
+                grid.ToggleGridState();
+                
             }
             else if (toggleMirror.GetStateDown(secondarySource) && mirrorAvailable)
             {
@@ -298,18 +297,20 @@ public float lineLength = 0.05f;
             }
             else if (switchSystemAction.GetStateDown(secondarySource) && mode.Equals(VRSketch.InteractionMode.FreeCreation))
             {
-                int currentSystemID = (int)this.sketchSystem;
-                int newSystemID = (currentSystemID + 2) % 4; // Switch between freehand and patch
-                OnSystemChange((SketchSystem)newSystemID, clearCanvas: false);
-                UpdateInstructions();
-                 OnModelChange(scenario.CurrentStep.Model);
-                if (objFiles.Length > 0)
-                {
-                    string path = objFiles[currentObjIndex];
-                    drawController.LoadAndDisplayOBJ(path);
+                // int currentSystemID = (int)this.sketchSystem;
+                // int newSystemID = (currentSystemID + 2) % 4; // Switch between freehand and patch
+                // OnSystemChange((SketchSystem)newSystemID, clearCanvas: false);
+                // UpdateInstructions();
+                //  OnModelChange(scenario.CurrentStep.Model);
+                // if (objFiles.Length > 0)
+                // {
+                //     string path = objFiles[currentObjIndex];
+                //     drawController.LoadAndDisplayOBJ(path);
 
-                    currentObjIndex = (currentObjIndex + 1) % objFiles.Length;
-                }
+                //     currentObjIndex = (currentObjIndex + 1) % objFiles.Length;
+                // }
+                canvas.displayMode+=1;
+                canvas.UpdateSpheres();
                
 
 
@@ -356,7 +357,7 @@ public float lineLength = 0.05f;
             {
                 currentAction = Action.Idle;
                 secondaryHandAppearance.OnGrabEnd();
-                // grid.OnTransformEnd();
+                grid.OnTransformEnd();
 
                 // Log data
                 scenario.CurrentStep.CanvasTransform(headTransform, Pos(primarySource), canvas.transform, mirroring);
@@ -364,7 +365,7 @@ public float lineLength = 0.05f;
             else
             {
                 grabController.GrabUpdate(Pos(secondarySource), Rot(secondarySource));
-                // grid.OnCanvasMove();
+                grid.OnCanvasMove();
             }
         }
 
@@ -376,7 +377,7 @@ public float lineLength = 0.05f;
                 zoomInteractionAppearance.OnZoomEnd();
                 primaryHandAppearance.OnZoomEnd();
                 secondaryHandAppearance.OnZoomEnd();
-                // grid.OnTransformEnd();
+                grid.OnTransformEnd();
 
                 // Log data
                 scenario.CurrentStep.CanvasTransform(headTransform, Pos(primarySource), canvas.transform, mirroring);
@@ -417,22 +418,22 @@ public float lineLength = 0.05f;
             StartCoroutine("WaitForConfirm");
 
         }
-        if (!lookingAtExample && studyNextAction.GetStateUp(secondarySource))
-        {
-            if (ShowModel)
-            {
-                ShowModel = false;
-                drawController.ShowMesh();
-            }
-            else
-            {
-                ShowModel = true;
-                drawController.HideMesh();
+        // if (!lookingAtExample && studyNextAction.GetStateUp(secondarySource))
+        // {
+        //     if (ShowModel)
+        //     {
+        //         ShowModel = false;
+        //         drawController.ShowMesh();
+        //     }
+        //     else
+        //     {
+        //         ShowModel = true;
+        //         drawController.HideMesh();
 
-            }
+        //     }
 
 
-        }
+        // }
 
 
 
